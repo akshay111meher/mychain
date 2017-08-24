@@ -6,7 +6,10 @@ import (
 	"encoding/hex"
 	"strconv"
 	"time"
-)
+	"log"
+	"net/http"
+	"golang.org/x/net/websocket"
+	)
 
 type Blockchain struct{
 	blocks []Block
@@ -68,7 +71,14 @@ func main() {
 
 	fmt.Println(bc.IsValidChain());
 
-	// fmt.Println(bc.blocks)
+	fmt.Println(bc.blocks)
+
+	http.Handle("/addPeer", websocket.Handler(peerHandler))
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic("ListenAndServe: " + err.Error())
+	}
+
 }
 
 func (b Block) SHA256() string{
@@ -152,4 +162,19 @@ func (b Block) IsNextBlockValid(nextBlock Block) bool{
 	}else{
 		return true
 	}
+}
+
+func peerHandler(ws *websocket.Conn){
+	msg := make([]byte, 20)
+	n, err := ws.Read(msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Receive: %s\n", msg[:n])
+
+	_, err = ws.Write([]byte("This is working"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Send: %s\n", "This is working")
 }
