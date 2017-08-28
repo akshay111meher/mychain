@@ -23,13 +23,13 @@ func (b Block) IsNextBlockValid(nextBlock Block) bool{
 	currentIndex,_ := strconv.Atoi(b.Index);
 	newBlockIndex,_ := strconv.Atoi(nextBlock.Index);
 	if(currentIndex + 1 != newBlockIndex){
-		fmt.Println("Index mismatch")
+		fmt.Println("Index mismatch. Index "+nextBlock.Index)
 		return false;
 	}else if(b.Hash != nextBlock.PreviousHash){
-		fmt.Println("Hash mismatch with previous block")
+		fmt.Println("Hash mismatch with previous block. Index "+nextBlock.Index)
 		return false;
 	}else if(nextBlock.Hash != nextBlock.SHA256()){
-		fmt.Println("Current block hash computed wrongly")
+		fmt.Println("Current block hash computed wrongly. Index "+nextBlock.Index)
 		return false
 	}else{
 		return true

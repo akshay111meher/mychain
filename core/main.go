@@ -31,19 +31,23 @@ func main() {
 	// bc.AddBlock(sixthBlock);
 	// //adding 5 blocks complete
 
-	//generating 7th block
+	// // generating 7th block
 	// seventhBlock := bc.GenerateNextBlock("This is seventh blockdata")
-	//let us modify hash of seventh block and add this to chain
-	//uncomment the below and try to add
-	// seventhBlock.hash = "asjkfhskjdhkjasdhk"
+	// // let us modify hash of seventh block and add this to chain
+	// // uncomment the below and try to add
+	// seventhBlock.Hash = "asjkfhskjdhkjasdhk"
 	// bc.AddBlock(seventhBlock);
 
 
-	eightBlock := bc.GenerateNextBlock("This is eight block. My name is akshay")
-	bc.AddBlock(eightBlock);
+	// eightBlock := bc.GenerateNextBlock("Prateek will come on Tuesday")
+	// bc.AddBlock(eightBlock);
 
-	fmt.Println(bc.IsValidChain());
-	fmt.Println(bc.Blocks)
+	bc.PrintChain();
+	if(bc.IsValidChain()){
+		fmt.Println("This is a valid Chain")
+	}else{
+		fmt.Println("This is an invalid Chain")
+	}
 	// StartPeer(&bc)
 
 }

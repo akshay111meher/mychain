@@ -83,6 +83,15 @@ func (bc *Blockchain) IsValidChain() bool{
 	return true;
 }
 
+func (bc *Blockchain) PrintChain(){
+	for i :=0; i <len(bc.Blocks); i++ {
+		b, err := json.MarshalIndent(bc.Blocks[i], "", "   ")
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		fmt.Print(string(b)+"\n")
+	}
+}
 func NewBlockchain() (bc Blockchain){
 	var blocks []Block
 	bc = Blockchain{blocks}
