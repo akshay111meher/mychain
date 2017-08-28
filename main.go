@@ -25,7 +25,7 @@ type CalculateHash interface{
 
 type BlockChainFunctions interface{
 	GetLatestBlock() Block
-	GenerateNextBlock() Block
+	GenerateNextBlock(blockData string) Block
 	IsValidNewBlock(newBlock Block) bool
 	AddBlock(newBlock Block) bool
 }
