@@ -4,6 +4,8 @@ import(
 	"strconv"
 	"time"
 	"fmt"
+	. "../controller"
+	"encoding/json"
 )
 
 
@@ -39,7 +41,10 @@ func (bc *Blockchain) GenerateNextBlock(blockData string) Block{
 }
 
 func (bc *Blockchain) IsValidNewBlock(newBlock Block) bool {
-	
+
+	if(len(bc.Blocks) == 0){
+		return true
+	}
 	latestBlockIndex,_:= strconv.Atoi(bc.GetLatestBlock().Index);
 	newBlockIndex,_ := strconv.Atoi(newBlock.Index);
 	if(newBlockIndex != latestBlockIndex+1){
@@ -59,6 +64,8 @@ func (bc *Blockchain) AddBlock(newBlock Block) bool{
 	if(bc.IsValidNewBlock(newBlock)){
 		bc.Blocks = append(bc.Blocks,newBlock)
 		fmt.Println("new block "+newBlock.Index+" appended to chain")
+		blockMarshal,_ := json.Marshal(newBlock)
+		CreateFile(newBlock.Index,blockMarshal);
 		return true
 	}
 	fmt.Println("new block "+newBlock.Index+" rejected from chain")
@@ -79,7 +86,27 @@ func (bc *Blockchain) IsValidChain() bool{
 func NewBlockchain() (bc Blockchain){
 	var blocks []Block
 	bc = Blockchain{blocks}
-	bc.Blocks = append(bc.Blocks,getGenesisBlock())
+	// bc.Blocks = append(bc.Blocks,getGenesisBlock())
+	bc.AddBlock(getGenesisBlock())
+	return bc
+}
+
+func LoadBlockchain() (bc Blockchain){
+	var blocks []Block
+	bc = Blockchain{blocks}
+	var temp Block
+	var count int = 0;
+	for {
+		countStr := strconv.Itoa(count)
+		blockData:= ReadFile(countStr);
+		if(len(blockData) == 0){
+			break;
+		}else{
+			json.Unmarshal(blockData,&temp)
+			bc.Blocks =append(bc.Blocks,temp)
+		}
+		count++;
+	}
 	return bc
 }
 func getGenesisBlock() Block{
