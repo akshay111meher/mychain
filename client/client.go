@@ -3,22 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-
+	. "../models"
 	"golang.org/x/net/websocket"
 )
 
-type Request struct{
-	Number int
-	Data string
-}
-
-type Block struct{
-	Index string
-	PreviousHash string
-	Timestamp string
-	Data string
-	Hash string
-}
 
 var origin = "http://localhost/"
 var url = "ws://localhost:8080/addPeer"
