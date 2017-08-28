@@ -6,7 +6,10 @@ import (
 	"encoding/hex"
 	"strconv"
 	"time"
-)
+	"log"
+	"net/http"
+	"golang.org/x/net/websocket"
+	)
 
 type Blockchain struct{
 	blocks []Block
@@ -28,6 +31,7 @@ type BlockChainFunctions interface{
 	GenerateNextBlock(blockData string) Block
 	IsValidNewBlock(newBlock Block) bool
 	AddBlock(newBlock Block) bool
+	IsValidChain() bool
 }
 func main() {
 	fmt.Println("programme started");
@@ -60,7 +64,21 @@ func main() {
 	// seventhBlock.hash = "asjkfhskjdhkjasdhk"
 	bc.AddBlock(seventhBlock);
 
+
+	eightBlock := bc.GenerateNextBlock("This is eight blockdata. May name is akshay")
+	bc.AddBlock(eightBlock);
+
+
+	fmt.Println(bc.IsValidChain());
+
 	fmt.Println(bc.blocks)
+
+	http.Handle("/addPeer", websocket.Handler(peerHandler))
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic("ListenAndServe: " + err.Error())
+	}
+
 }
 
 func (b Block) SHA256() string{
@@ -116,4 +134,47 @@ func (bc *Blockchain) AddBlock(newBlock Block) bool{
 	}
 	fmt.Println("new block "+newBlock.index+" rejected from chain")
 	return false
+}
+
+func (bc *Blockchain) IsValidChain() bool{
+	for i := 1; i < len(bc.blocks); i++ {
+		if(bc.blocks[i-1].IsNextBlockValid(bc.blocks[i])){
+			continue;
+		}else{
+			return false;
+		}
+	}
+	return true;
+}
+
+func (b Block) IsNextBlockValid(nextBlock Block) bool{
+	currentIndex,_ := strconv.Atoi(b.index);
+	newBlockIndex,_ := strconv.Atoi(nextBlock.index);
+	if(currentIndex + 1 != newBlockIndex){
+		fmt.Println("Index mismatch")
+		return false;
+	}else if(b.hash != nextBlock.previousHash){
+		fmt.Println("Hash mismatch with previous block")
+		return false;
+	}else if(nextBlock.hash != nextBlock.SHA256()){
+		fmt.Println("Current block hash computed wrongly")
+		return false
+	}else{
+		return true
+	}
+}
+
+func peerHandler(ws *websocket.Conn){
+	msg := make([]byte, 20)
+	n, err := ws.Read(msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Receive: %s\n", msg[:n])
+
+	_, err = ws.Write([]byte("This is working"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Send: %s\n", "This is working")
 }
