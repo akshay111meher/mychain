@@ -29,9 +29,9 @@ func main() {
 	//add more blocks 
 	bc := LoadBlockchain()
 	//create Account if necessary
-	// CreateAccount("prateek")
-	privKey,pubKey := GetAccount("prateek")
-	data := "this is prateek second data to be signed with his key"
+	CreateAccount("ravi")
+	privKey,pubKey := GetAccount("ravi")
+	data := "this is ravi main data to be signed with his key"
 	r,s := GetSignature(data,privKey)
 	var d = Data{data,pubKey,r,s}
 	bytes,_ := json.Marshal(d)
