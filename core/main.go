@@ -4,45 +4,25 @@ import (
 	"fmt"
 	. "../models"
 	_ "../peer"
-	// . "../controller"
-	// . "../crypto"
-	// "encoding/json"
+	. "../controller"
+	. "../crypto"
+	"encoding/json"
 	"math/rand"
 	)
 
-
+var bc Blockchain
 func main() {
 	fmt.Println("programme started");
 	fmt.Println("blocks start for 0 to n-1");
 
-	// // //Initiate a new blockchain with genesis block
-	// CreateAccount("akshay")
-	// privKey,pubKey := GetAccount("akshay")
-	// data := "this is the data to be hashed"
-	// r,s := GetSignature(data,privKey)
-	// var d = Data{data,pubKey,r,s}
-	// bytes,_ := json.Marshal(d)
-	// bc := NewBlockchain(string(bytes))
-	// //Initiate a new blockchain with genesis block
 
+   //Init Block
+//    generateInitBlock()
+   //Init Block
 
-
-	//add more blocks 
-	bc := LoadBlockchain()
-	// // create Account if necessary
-	// CreateAccount("deepak")
-	
-	// for i:=0;i<100;i++ {
-	// 	privKey,pubKey := GetAccount("saurabh")
-	// 	value := randSeq(150)
-	// 	r,s := GetSignature(value,privKey)
-	// 	var d = Data{value,pubKey,r,s}
-	// 	bytes,_ := json.Marshal(d)
-	// 	nextBlock := bc.GenerateNextBlock(string(bytes))
-	// 	bc.AddBlock(nextBlock);
-	// }
-
-	//add more blocks 
+	// // //add more blocks 
+	generateBlock(1);
+	// // //add more blocks 
 
 	bc.PrintChain();
 	if(bc.IsValidChain()){
@@ -62,4 +42,30 @@ func randSeq(n int) string {
         b[i] = letters[rand.Intn(len(letters))]
     }
     return string(b)
+}
+
+func generateBlock(n int){
+	bc = LoadBlockchain()
+
+	for i:=0;i<n;i++ {
+		privKey,pubKey := GetAccount("saurabh")
+		value := randSeq(40)
+		r,s := GetSignature(value,privKey)
+		var d = Data{value,pubKey,r,s}
+		bytes,_ := json.Marshal(d)
+		nextBlock := bc.GenerateNextBlock(string(bytes))
+		bc.AddBlock(nextBlock);
+	}
+}
+func generateInitBlock(){
+	// //Initiate a new blockchain with genesis block
+	// Create account if necessary
+	// CreateAccount("akshay")
+	privKey,pubKey := GetAccount("akshay")
+	data := "this is genesis block data";
+	r,s := GetSignature(data,privKey)
+	var d = Data{data,pubKey,r,s}
+	bytes,_ := json.Marshal(d)
+	bc = NewBlockchain(string(bytes))
+	//Initiate a new blockchain with genesis block
 }

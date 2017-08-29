@@ -14,6 +14,7 @@ type Block struct{
 	Timestamp string
 	Data string
 	Hash string
+	Nonce string
 }
 
 func (b Block) SHA256() string{

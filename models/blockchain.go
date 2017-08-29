@@ -5,6 +5,7 @@ import(
 	"time"
 	"fmt"
 	. "../controller"
+	. "../consensus"
 	"encoding/json"
 )
 
@@ -34,9 +35,10 @@ func (bc *Blockchain) GenerateNextBlock(blockData string) Block{
 	nextIndexNum:= currentIndex+1;
 	nextIndex := strconv.Itoa(nextIndexNum)
 	nextTimeStamp  := time.Now().Format("20060102150405")
-	nextBlock := Block{nextIndex,previousBlock.Hash,nextTimeStamp,blockData,""};
+	nextBlock := Block{nextIndex,previousBlock.Hash,nextTimeStamp,blockData,"",""};
 	hashByte:= nextBlock.SHA256();
 	nextBlock.Hash = string(hashByte[:])
+	nextBlock.Nonce = ReturnNonce(nextBlock.Hash)
 	return nextBlock
 }
 
@@ -125,7 +127,7 @@ func LoadBlockchain() (bc Blockchain){
 	return bc
 }
 func getGenesisBlock(data string) Block{
-	b := Block{"0","0","20170823181145",data,""};
+	b := Block{"0","0","20170823181145",data,"","0"};
 	hashByte:= b.SHA256();
 	b.Hash = string(hashByte[:])
 	return b;
