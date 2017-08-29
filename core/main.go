@@ -4,6 +4,9 @@ import (
 	"fmt"
 	. "../models"
 	_ "../peer"
+	. "../controller"
+	. "../crypto"
+	"encoding/json"
 	)
 
 
@@ -11,36 +14,30 @@ func main() {
 	fmt.Println("programme started");
 	fmt.Println("blocks start for 0 to n-1");
 
-	//Initiate a new blockchain or loadOldBlockchain with genesis block
+	// // //Initiate a new blockchain with genesis block
+	// CreateAccount("akshay")
+	// privKey,pubKey := GetAccount("akshay")
+	// data := "this is the data to be hashed"
+	// r,s := GetSignature(data,privKey)
+	// var d = Data{data,pubKey,r,s}
+	// bytes,_ := json.Marshal(d)
+	// bc := NewBlockchain(string(bytes))
+	// //Initiate a new blockchain with genesis block
+
+
+
+	//add more blocks 
 	bc := LoadBlockchain()
-
-	// //Adding 5 blocks to the chain
-	// secondBlock := bc.GenerateNextBlock("This is second blockdata")
-	// bc.AddBlock(secondBlock);
-
-	// thirdBlock := bc.GenerateNextBlock("This is third blockdata")
-	// bc.AddBlock(thirdBlock);
-
-	// fourthBlock := bc.GenerateNextBlock("This is fourth blockdata")
-	// bc.AddBlock(fourthBlock);
-
-	// fifthBlock := bc.GenerateNextBlock("This is fifth blockdata")
-	// bc.AddBlock(fifthBlock);
-
-	// sixthBlock := bc.GenerateNextBlock("This is sixth blockdata")
-	// bc.AddBlock(sixthBlock);
-	// //adding 5 blocks complete
-
-	// // generating 7th block
-	// seventhBlock := bc.GenerateNextBlock("This is seventh blockdata")
-	// // let us modify hash of seventh block and add this to chain
-	// // uncomment the below and try to add
-	// seventhBlock.Hash = "asjkfhskjdhkjasdhk"
-	// bc.AddBlock(seventhBlock);
-
-
-	// eightBlock := bc.GenerateNextBlock("Prateek will come on Tuesday")
-	// bc.AddBlock(eightBlock);
+	//create Account if necessary
+	// CreateAccount("prateek")
+	privKey,pubKey := GetAccount("prateek")
+	data := "this is prateek second data to be signed with his key"
+	r,s := GetSignature(data,privKey)
+	var d = Data{data,pubKey,r,s}
+	bytes,_ := json.Marshal(d)
+	nextBlock := bc.GenerateNextBlock(string(bytes))
+	bc.AddBlock(nextBlock);
+	//add more blocks 
 
 	bc.PrintChain();
 	if(bc.IsValidChain()){

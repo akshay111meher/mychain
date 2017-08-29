@@ -21,7 +21,7 @@ func (bc *Blockchain) GetNthBlock(n int) Block{
 	if(n >= len(bc.Blocks)){
 		return bc.GetLatestBlock()
 	}else if(n<=0){
-		return getGenesisBlock()
+		return bc.Blocks[0]
 	}else{
 		return bc.Blocks[n]
 	}
@@ -43,7 +43,11 @@ func (bc *Blockchain) GenerateNextBlock(blockData string) Block{
 func (bc *Blockchain) IsValidNewBlock(newBlock Block) bool {
 
 	if(len(bc.Blocks) == 0){
-		return true
+		if(newBlock.IsThisBlockValid()){
+			return true
+		}else{
+		    return false
+		}
 	}
 	latestBlockIndex,_:= strconv.Atoi(bc.GetLatestBlock().Index);
 	newBlockIndex,_ := strconv.Atoi(newBlock.Index);
@@ -55,6 +59,8 @@ func (bc *Blockchain) IsValidNewBlock(newBlock Block) bool {
 		return false
 	}else if(newBlock.Hash != newBlock.SHA256()){
 		fmt.Println("hashes computed dont match")
+		return false
+	}else if(!newBlock.IsThisBlockValid()){
 		return false
 	}
 	return true
@@ -85,18 +91,18 @@ func (bc *Blockchain) IsValidChain() bool{
 
 func (bc *Blockchain) PrintChain(){
 	for i :=0; i <len(bc.Blocks); i++ {
-		b, err := json.MarshalIndent(bc.Blocks[i], "", "   ")
+		b, err := json.MarshalIndent(bc.Blocks[i], "", "  ")
 		if err != nil {
 			fmt.Println("error:", err)
 		}
-		fmt.Print(string(b)+"\n")
+		fmt.Print(string(b))
 	}
 }
-func NewBlockchain() (bc Blockchain){
+func NewBlockchain(data string) (bc Blockchain){
 	var blocks []Block
 	bc = Blockchain{blocks}
 	// bc.Blocks = append(bc.Blocks,getGenesisBlock())
-	bc.AddBlock(getGenesisBlock())
+	bc.AddBlock(getGenesisBlock(data))
 	return bc
 }
 
@@ -118,8 +124,8 @@ func LoadBlockchain() (bc Blockchain){
 	}
 	return bc
 }
-func getGenesisBlock() Block{
-	b := Block{"0","0","20170823181145","this is genesis block",""};
+func getGenesisBlock(data string) Block{
+	b := Block{"0","0","20170823181145",data,""};
 	hashByte:= b.SHA256();
 	b.Hash = string(hashByte[:])
 	return b;

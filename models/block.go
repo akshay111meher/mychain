@@ -4,6 +4,7 @@ import(
 	"strconv"
 	"fmt"
 	. "../crypto"
+	"encoding/json"
 )
 
 
@@ -31,7 +32,17 @@ func (b Block) IsNextBlockValid(nextBlock Block) bool{
 	}else if(nextBlock.Hash != nextBlock.SHA256()){
 		fmt.Println("Current block hash computed wrongly. Index "+nextBlock.Index)
 		return false
+	}else if(!nextBlock.IsThisBlockValid()){
+		return false
 	}else{
 		return true
 	}
 }
+
+func (b Block) IsThisBlockValid() bool{
+	var d Data
+	json.Unmarshal([]byte(b.Data),&d)
+
+	return Verify(d.Value,d.PublicKey,d.R,d.S)
+}
+
