@@ -5,9 +5,9 @@ import(
 	"fmt"
 	"io/ioutil"
 )
-func CreateFile(index string, blockData []byte) {
+func CreateFile(previousHash string, blockData []byte) {
 	// detect if file exists
-	path:= "../data/"+index+".json"
+	path:= "../data/"+previousHash+".json"
 	var _, err = os.Stat(path)
 
 	// create file if not exists

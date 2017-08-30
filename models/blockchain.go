@@ -73,7 +73,7 @@ func (bc *Blockchain) AddBlock(newBlock Block) bool{
 		bc.Blocks = append(bc.Blocks,newBlock)
 		fmt.Println("new block "+newBlock.Index+" appended to chain")
 		blockMarshal,_ := json.Marshal(newBlock)
-		CreateFile(newBlock.Index,blockMarshal);
+		CreateFile(newBlock.PreviousHash,blockMarshal);
 		return true
 	}
 	fmt.Println("new block "+newBlock.Index+" rejected from chain")
@@ -112,17 +112,17 @@ func LoadBlockchain() (bc Blockchain){
 	var blocks []Block
 	bc = Blockchain{blocks}
 	var temp Block
-	var count int = 0;
+	var previousHash string;
+	previousHash = "0"
 	for {
-		countStr := strconv.Itoa(count)
-		blockData:= ReadFile(countStr);
+		blockData:= ReadFile(previousHash);
 		if(len(blockData) == 0){
 			break;
 		}else{
 			json.Unmarshal(blockData,&temp)
 			bc.Blocks =append(bc.Blocks,temp)
+			previousHash = temp.Hash
 		}
-		count++;
 	}
 	return bc
 }

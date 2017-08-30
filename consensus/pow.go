@@ -17,6 +17,7 @@ func ReturnNonce(s string) string{
 			break;
 		}else{
 			nonce.Add(nonce,big.NewInt(1))
+			// fmt.Println(nonce.String())
 		}
 	}
 	return nonce.String();

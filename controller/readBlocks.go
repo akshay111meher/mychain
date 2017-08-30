@@ -4,9 +4,9 @@ import(
 	"io/ioutil"
 )
 
-func ReadFile(blockNumber string) []byte{
+func ReadFile(previousHash string) []byte{
 	// re-open file
-	 b, err := ioutil.ReadFile("../data/"+blockNumber+".json") // just pass the file name
+	 b, err := ioutil.ReadFile("../data/"+previousHash+".json") // just pass the file name
     if err != nil {
         return []byte("")
     }

@@ -16,13 +16,13 @@ func main() {
 	fmt.Println("blocks start for 0 to n-1");
 
 
-   //Init Block
-//    generateInitBlock()
-   //Init Block
+//    //Init Block
+//      generateInitBlock()
+//    //Init Block
 
-	// // //add more blocks 
+	// //add more blocks 
 	generateBlock(1);
-	// // //add more blocks 
+	// //add more blocks 
 
 	bc.PrintChain();
 	if(bc.IsValidChain()){
@@ -48,7 +48,7 @@ func generateBlock(n int){
 	bc = LoadBlockchain()
 
 	for i:=0;i<n;i++ {
-		privKey,pubKey := GetAccount("saurabh")
+		privKey,pubKey := GetAccount("ayush")
 		value := randSeq(40)
 		r,s := GetSignature(value,privKey)
 		var d = Data{value,pubKey,r,s}
