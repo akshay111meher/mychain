@@ -17,7 +17,7 @@ func CreateFile(previousHash string, blockData []byte) {
 		defer file.Close()
 	}
 
-	fmt.Println("==> done creating file", path)
+	// fmt.Println("==> done creating file", path)
 	writeFile(path,blockData)
 }
 
@@ -34,9 +34,8 @@ func writeFile(path string,data []byte) {
 	err := ioutil.WriteFile(path, data, 0644)
 
 	if isError(err){
-		fmt.Println("==> failed writing to file")
+		fmt.Println("==> failed writing to file",path)
 	}else{
-
-		fmt.Println("==> done writing to file")
+		// fmt.Println("==> done writing to file")
 	}
 }

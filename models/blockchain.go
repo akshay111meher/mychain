@@ -11,26 +11,41 @@ import(
 
 
 type Blockchain struct{
-	Blocks []Block
-}
-func (bc *Blockchain) GetLatestBlock() Block{
-	return bc.Blocks[len(bc.Blocks) - 1];
+	Blocks Block
+	Next []*Blockchain
+	Previous *Blockchain
 }
 
+func (root *Blockchain) GetLatestBlock() Block{
+	return root.GetLatestNode().Blocks
+}
 
-func (bc *Blockchain) GetNthBlock(n int) Block{
-	if(n >= len(bc.Blocks)){
-		return bc.GetLatestBlock()
-	}else if(n<=0){
-		return bc.Blocks[0]
+func (root *Blockchain) GetNthBlockFromRoot(n int) Block{
+	tail := root.GetLatestNode();
+	return tail.GetNthBlock(n)
+}
+
+func (tail *Blockchain) GetNthBlock(n int) Block{
+	if(tail.Previous == nil){
+		nString := strconv.Itoa(n)
+		if(nString == tail.Blocks.Index){
+			return tail.Blocks
+		}else{
+		   return Block{}
+		}
 	}else{
-		return bc.Blocks[n]
+		nString := strconv.Itoa(n)
+		if(nString == tail.Blocks.Index){
+			return tail.Blocks
+		}else{
+			return tail.Previous.GetNthBlock(n)
+		}
 	}
 }
 
 
-func (bc *Blockchain) GenerateNextBlock(blockData string) Block{
-	previousBlock:= bc.GetLatestBlock();
+func (root *Blockchain) GenerateNextBlock(blockData string) Block{
+	previousBlock:= root.GetLatestBlock();
 	currentIndex,_ := strconv.Atoi(previousBlock.Index);
 	nextIndexNum:= currentIndex+1;
 	nextIndex := strconv.Itoa(nextIndexNum)
@@ -42,21 +57,21 @@ func (bc *Blockchain) GenerateNextBlock(blockData string) Block{
 	return nextBlock
 }
 
-func (bc *Blockchain) IsValidNewBlock(newBlock Block) bool {
+func (root *Blockchain) IsValidNewBlock(newBlock Block) bool {
 
-	if(len(bc.Blocks) == 0){
+	if(len(root.Next) == 0){
 		if(newBlock.IsThisBlockValid()){
 			return true
 		}else{
 		    return false
 		}
 	}
-	latestBlockIndex,_:= strconv.Atoi(bc.GetLatestBlock().Index);
+	latestBlockIndex,_:= strconv.Atoi(root.GetLatestBlock().Index);
 	newBlockIndex,_ := strconv.Atoi(newBlock.Index);
 	if(newBlockIndex != latestBlockIndex+1){
 		fmt.Println("invalid index")
 		return false
-	}else if(bc.GetLatestBlock().Hash != newBlock.PreviousHash){
+	}else if(root.GetLatestBlock().Hash != newBlock.PreviousHash){
 		fmt.Println("invalid previous hash")
 		return false
 	}else if(newBlock.Hash != newBlock.SHA256()){
@@ -68,9 +83,28 @@ func (bc *Blockchain) IsValidNewBlock(newBlock Block) bool {
 	return true
 }
 
-func (bc *Blockchain) AddBlock(newBlock Block) bool{
-	if(bc.IsValidNewBlock(newBlock)){
-		bc.Blocks = append(bc.Blocks,newBlock)
+func (root *Blockchain) SaveChainUsingRoot(){
+	tail := root.GetLatestNode();
+	tail.SaveChain()
+	fmt.Println("Chain saved")
+}
+func (tail *Blockchain) SaveChain(){
+	if tail.Previous == nil{
+		return
+	}else{
+		blockMarshal,_ := json.Marshal(tail.Blocks)
+		CreateFile(tail.Blocks.PreviousHash,blockMarshal)
+		tail.Previous.SaveChain()
+	}
+}
+func (root *Blockchain) AddBlock(newBlock Block) bool{
+	if(root.IsValidNewBlock(newBlock)){
+		tail := root.GetLatestNode()
+		if tail.AppendFromEnd(newBlock){
+			fmt.Println("Received Latest Block ",newBlock.Index)
+		}else{
+			root.AppendToChain(newBlock)
+		}
 		fmt.Println("new block "+newBlock.Index+" appended to chain")
 		blockMarshal,_ := json.Marshal(newBlock)
 		CreateFile(newBlock.PreviousHash,blockMarshal);
@@ -79,55 +113,133 @@ func (bc *Blockchain) AddBlock(newBlock Block) bool{
 	fmt.Println("new block "+newBlock.Index+" rejected from chain")
 	return false
 }
-
-func (bc *Blockchain) IsValidChain() bool{
-	for i := 1; i < len(bc.Blocks); i++ {
-		if(bc.Blocks[i-1].IsNextBlockValid(bc.Blocks[i])){
-			continue;
+func (root *Blockchain) IsValidChainFromEnd() bool{
+	tail := root.GetLatestNode()
+	return tail.IsValidChain()
+}
+func (tail *Blockchain) IsValidChain() bool{
+	
+	if tail.Previous == nil{
+		return true
+	}else{
+		if tail.Previous.Blocks.IsNextBlockValid(tail.Blocks){
+			return tail.Previous.IsValidChain()
 		}else{
-			return false;
+			return false
 		}
 	}
-	return true;
 }
-
-func (bc *Blockchain) PrintChain(){
-	for i :=0; i <len(bc.Blocks); i++ {
-		b, err := json.MarshalIndent(bc.Blocks[i], "", "  ")
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-		fmt.Print(string(b))
+func (root *Blockchain) PrintChainUsingRoot(){
+	tail := root.GetLatestNode()
+	fmt.Println(tail)
+	tail.PrintChain();
+}
+func (tail *Blockchain) PrintChain(){
+	b,err := json.MarshalIndent(tail.Blocks,"","  ")
+	if err!= nil {
+		fmt.Println("error:", err)
 	}
+	fmt.Println(string(b))
+	if tail.Previous == nil{
+		return
+	}
+	tail.Previous.PrintChain()
+	
 }
-func NewBlockchain(data string) (bc Blockchain){
-	var blocks []Block
-	bc = Blockchain{blocks}
-	// bc.Blocks = append(bc.Blocks,getGenesisBlock())
-	bc.AddBlock(getGenesisBlock(data))
-	return bc
+func NewBlockchain(data string) (Blockchain){
+	
+	b := getGenesisBlock(data)
+	// pointer := new(Blockchain)
+	var array []*Blockchain;
+	root := Blockchain{b,array,nil}
+	blockMarshal,_ := json.Marshal(b)
+	CreateFile(b.PreviousHash,blockMarshal);
+	return root
 }
 
-func LoadBlockchain() (bc Blockchain){
-	var blocks []Block
-	bc = Blockchain{blocks}
+func LoadBlockchain() (Blockchain){
 	var temp Block
+	var array []*Blockchain;
 	var previousHash string;
 	previousHash = "0"
+	
+	blockData := ReadFile(previousHash)
+	json.Unmarshal(blockData, &temp)
+	root := Blockchain{temp,array,nil}
+	previousHash = temp.Hash
+
 	for {
 		blockData:= ReadFile(previousHash);
 		if(len(blockData) == 0){
 			break;
 		}else{
 			json.Unmarshal(blockData,&temp)
-			bc.Blocks =append(bc.Blocks,temp)
+			root.AppendToChain(temp)
+			previousHash = temp.Hash
 		}
 	}
-	return bc
+	return root
 }
 func getGenesisBlock(data string) Block{
 	b := Block{"0","0","20170823181145",data,"","0"};
 	hashByte:= b.SHA256();
 	b.Hash = string(hashByte[:])
 	return b;
+}
+
+func (bc *Blockchain) AppendToChain(nextBlock Block) bool{
+	if(nextBlock.PreviousHash == bc.Blocks.Hash){
+		newNode := new(Blockchain);
+		newNode.Blocks = nextBlock;
+		var array []*Blockchain;		
+		newNode.Next = array;
+		newNode.Previous = bc;
+		bc.Next = append(bc.Next,newNode)
+		return true
+	}else{
+		for i:=0;i<len(bc.Next);i++{
+			if bc.Next[i].AppendToChain(nextBlock){
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (bc *Blockchain) GetLatestNode() (*Blockchain){
+	var array []*Blockchain
+	q := Queue{array}
+
+	q.Push(bc)
+	var lastNode *Blockchain
+	for;;{
+		if(len(q.Array)==0){
+			break
+		}else{
+			lastNode = q.Pop()
+			for i:=0;i<len(lastNode.Next);i++{
+				q.Push(lastNode.Next[i])
+			}
+		}	
+	}
+
+	return lastNode
+}
+
+func (bc *Blockchain) AppendFromEnd(newBlock Block) bool{
+	if(bc.Blocks.Hash == newBlock.PreviousHash){
+		newNode := new(Blockchain)
+		newNode.Blocks = newBlock
+		var array []*Blockchain;		
+		newNode.Next = array;
+		newNode.Previous = bc
+		bc.Next = append(bc.Next,newNode)
+		return true
+	}else{
+			if bc.Previous == nil{
+				return false
+			}else{
+				return bc.Previous.AppendFromEnd(newBlock)
+			}
+	}
 }

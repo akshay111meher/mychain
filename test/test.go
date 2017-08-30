@@ -34,7 +34,6 @@ func (q *Queue) Pop () (*Blockchain){
 }
 func (bc *Blockchain) AppendToChain(nextBlock Block) bool{
 	if(nextBlock.PreviousHash == bc.Blocks.Hash){
-		fmt.Println(bc.Next)
 		newNode := new(Blockchain);
 		newNode.Blocks = nextBlock;
 		var array []*Blockchain;		
@@ -80,10 +79,14 @@ func (bc *Blockchain) AppendFromEnd(newBlock Block) bool{
 		newNode.Next = array;
 		newNode.Previous = bc
 		bc.Next = append(bc.Next,newNode)
+		return true
 	}else{
-			return bc.Previous.AppendFromEnd(newBlock)
+			if bc.Previous == nil{
+				return false
+			}else{
+				return bc.Previous.AppendFromEnd(newBlock)
+			}
 	}
-	return false
 }
 
 func main(){
@@ -132,6 +135,31 @@ func main(){
 		b2 = Block{"7","pp","32","42","qq","62"}
 		// fmt.Println(b2)
 		fmt.Println(endNode.AppendFromEnd(b2))
-		// endNode = root.GetLatestNode()
+		endNode = root.GetLatestNode()
+
+		b2 = Block{"4","ee","32","42","ss","62"}
+		// fmt.Println(b2)
+		fmt.Println(endNode.AppendFromEnd(b2))
+		endNode = root.GetLatestNode()
+
+		b2 = Block{"5","ss","32","42","tt","62"}
+		// fmt.Println(b2)
+		fmt.Println(endNode.AppendFromEnd(b2))
+		endNode = root.GetLatestNode()
+		
+		b2 = Block{"6","tt","32","42","uu","62"}
+		// fmt.Println(b2)
+		fmt.Println(endNode.AppendFromEnd(b2))
+		endNode = root.GetLatestNode()
+
+		b2 = Block{"7","uu","32","42","vv","62"}
+		// fmt.Println(b2)
+		fmt.Println(endNode.AppendFromEnd(b2))
+		endNode = root.GetLatestNode()
+
+		b2 = Block{"8","vv","32","42","ww","62"}
+		// fmt.Println(b2)
+		fmt.Println(endNode.AppendFromEnd(b2))
+		endNode = root.GetLatestNode()
 		fmt.Println(endNode)
 }

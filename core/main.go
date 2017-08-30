@@ -19,17 +19,20 @@ func main() {
 //    //Init Block
 //      generateInitBlock()
 //    //Init Block
-
+// 	bc.PrintChainUsingRoot();
 	// //add more blocks 
-	generateBlock(1);
+	generateBlock(0);
 	// //add more blocks 
 
-	bc.PrintChain();
-	if(bc.IsValidChain()){
+	bc.PrintChainUsingRoot();
+
+	fmt.Println(bc.GetNthBlockFromRoot(20))
+	if(bc.IsValidChainFromEnd()){
 		fmt.Println("This is a valid Chain")
 	}else{
 		fmt.Println("This is an invalid Chain")
 	}
+
 	// StartPeer(&bc)
 
 }
@@ -46,7 +49,6 @@ func randSeq(n int) string {
 
 func generateBlock(n int){
 	bc = LoadBlockchain()
-
 	for i:=0;i<n;i++ {
 		privKey,pubKey := GetAccount("ayush")
 		value := randSeq(40)

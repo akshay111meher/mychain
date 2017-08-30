@@ -7,7 +7,10 @@ import(
 
 func ReturnNonce(s string) string{
 	target:= big.NewInt(0)
-	target.SetString("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",16)
+	target.SetString("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",16)
+	difficulty := big.NewInt(0)
+	difficulty.SetString("fffff00000000000000000000000000000000000000000000000000000000000",16)
+	target.Sub(target,difficulty)
 	nonce:= big.NewInt(0)
 	var byteArray [32]byte
 	for ;;{
