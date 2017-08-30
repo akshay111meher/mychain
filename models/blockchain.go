@@ -131,7 +131,6 @@ func (tail *Blockchain) IsValidChain() bool{
 }
 func (root *Blockchain) PrintChainUsingRoot(){
 	tail := root.GetLatestNode()
-	fmt.Println(tail)
 	tail.PrintChain();
 }
 func (tail *Blockchain) PrintChain(){
