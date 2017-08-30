@@ -33,7 +33,8 @@ func (b Block) IsNextBlockValid(nextBlock Block) bool{
 	}else if(nextBlock.Hash != nextBlock.SHA256()){
 		fmt.Println("Current block hash computed wrongly. Index "+nextBlock.Index)
 		return false
-	}else if(!nextBlock.IsThisBlockValid()){
+	}else if(!nextBlock.IsThisDataValid()){
+		fmt.Println("Data-Value format mismatch")
 		return false
 	}else{
 		return true
@@ -41,6 +42,14 @@ func (b Block) IsNextBlockValid(nextBlock Block) bool{
 }
 
 func (b Block) IsThisBlockValid() bool{
+	if b.Hash == b.SHA256() {
+		return true
+	}else{
+		return false;
+	}
+}
+
+func (b Block) IsThisDataValid() bool{
 	var d Data
 	json.Unmarshal([]byte(b.Data),&d)
 

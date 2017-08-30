@@ -24,15 +24,49 @@ func main() {
 	generateBlock(0);
 	// //add more blocks 
 
-	bc.PrintChainUsingRoot();
+	// // bc.PrintChainFromRoot();
+	// fmt.Println("##############")
+	// fmt.Println(bc.GetNthBlockFromRoot(2).Hash)
+	// fmt.Println(bc.GetNthBlockFromRoot(3).Hash)
+	// fmt.Println("##############")
 
-	fmt.Println(bc.GetNthBlockFromRoot(20))
+
+	// 	privKey,pubKey := GetAccount("ayush")
+	// 	value := randSeq(40)
+	// 	r,s := GetSignature(value,privKey)
+	// 	var d = Data{value,pubKey,r,s}
+	// 	bytes,_ := json.Marshal(d)
+		
+	// firstForkBlock := bc.GetForkBlock(string(bytes),bc.GetNthBlockFromRoot(1).Hash,2)
+	// firstForkHash := firstForkBlock.SHA256();
+	// bc.AddBlock(firstForkBlock)
+	// // bc.PrintChainFromRoot()
+	// secondForkBlock := bc.GetForkBlock(string(bytes),firstForkHash,3)
+	// secondForkHash := secondForkBlock.SHA256();
+	// bc.AddBlock(secondForkBlock)
+	// thirdForkBlock := bc.GetForkBlock(string(bytes),secondForkHash,4)
+	// thirdForkHash := thirdForkBlock.SHA256();
+	// bc.AddBlock(thirdForkBlock)
+	// fourthForkBlock := bc.GetForkBlock(string(bytes),thirdForkHash,5)
+	// _ = fourthForkBlock.SHA256();
+	// bc.AddBlock(fourthForkBlock)
+	
+
+	// fmt.Println("************")
+	// fmt.Println(bc.GetNthBlockFromRoot(2).Hash)
+	// fmt.Println(bc.GetNthBlockFromRoot(3).Hash)
+	// fmt.Println(bc.GetNthBlockFromRoot(4).Hash)
+	// fmt.Println(bc.GetNthBlockFromRoot(5).Hash)
+	// fmt.Println("************")
+	// // bc.AddBlock(forkBlock)
+	bc.PrintChainFromRoot();
 	if(bc.IsValidChainFromEnd()){
 		fmt.Println("This is a valid Chain")
 	}else{
 		fmt.Println("This is an invalid Chain")
 	}
 
+	bc.SaveChainUsingRoot()
 	// StartPeer(&bc)
 
 }

@@ -57,6 +57,17 @@ func (root *Blockchain) GenerateNextBlock(blockData string) Block{
 	return nextBlock
 }
 
+func (root *Blockchain) GetForkBlock(blockData ,previousBlockHash string, num int) Block{
+	nextIndexNum:= num;
+	nextIndex := strconv.Itoa(nextIndexNum)
+	nextTimeStamp  := time.Now().Format("20060102150405")
+	nextBlock := Block{nextIndex,previousBlockHash,nextTimeStamp,blockData,"",""};
+	hashByte:= nextBlock.SHA256();
+	nextBlock.Hash = string(hashByte[:])
+	nextBlock.Nonce = ReturnNonce(nextBlock.Hash)
+	return nextBlock
+}
+
 func (root *Blockchain) IsValidNewBlock(newBlock Block) bool {
 
 	if(len(root.Next) == 0){
@@ -98,18 +109,31 @@ func (tail *Blockchain) SaveChain(){
 	}
 }
 func (root *Blockchain) AddBlock(newBlock Block) bool{
+	if !newBlock.IsThisDataValid(){
+		return false
+	}
+
 	if(root.IsValidNewBlock(newBlock)){
 		tail := root.GetLatestNode()
 		if tail.AppendFromEnd(newBlock){
 			fmt.Println("Received Latest Block ",newBlock.Index)
-		}else{
-			root.AppendToChain(newBlock)
 		}
 		fmt.Println("new block "+newBlock.Index+" appended to chain")
 		blockMarshal,_ := json.Marshal(newBlock)
 		CreateFile(newBlock.PreviousHash,blockMarshal);
 		return true
+	}else{
+		if newBlock.IsThisBlockValid(){
+			if root.AppendToChain(newBlock){
+				fmt.Println("Forked block received")
+				return true
+			}else{
+				fmt.Println("invalid forked block received")
+				return false
+			}
+		}
 	}
+
 	fmt.Println("new block "+newBlock.Index+" rejected from chain")
 	return false
 }
@@ -118,7 +142,6 @@ func (root *Blockchain) IsValidChainFromEnd() bool{
 	return tail.IsValidChain()
 }
 func (tail *Blockchain) IsValidChain() bool{
-	
 	if tail.Previous == nil{
 		return true
 	}else{
@@ -129,7 +152,7 @@ func (tail *Blockchain) IsValidChain() bool{
 		}
 	}
 }
-func (root *Blockchain) PrintChainUsingRoot(){
+func (root *Blockchain) PrintChainFromRoot(){
 	tail := root.GetLatestNode()
 	tail.PrintChain();
 }
@@ -188,6 +211,12 @@ func getGenesisBlock(data string) Block{
 
 func (bc *Blockchain) AppendToChain(nextBlock Block) bool{
 	if(nextBlock.PreviousHash == bc.Blocks.Hash){
+		index,_ := strconv.Atoi(bc.Blocks.Index)
+		nextIndex,_ := strconv.Atoi(nextBlock.Index)
+		if(index+1 != nextIndex){
+			fmt.Println("Index mismatch")
+			return false
+		}
 		newNode := new(Blockchain);
 		newNode.Blocks = nextBlock;
 		var array []*Blockchain;		
