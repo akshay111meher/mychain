@@ -121,7 +121,6 @@ func LoadBlockchain() (bc Blockchain){
 		}else{
 			json.Unmarshal(blockData,&temp)
 			bc.Blocks =append(bc.Blocks,temp)
-			previousHash = temp.Hash
 		}
 	}
 	return bc
