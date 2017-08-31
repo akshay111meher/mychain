@@ -13,14 +13,16 @@ import (
 
 
 var origin = "http://localhost/"
-var urlGetBlock = "ws://10.200.208.52:8080/getBlock"
-var urlSendBlock = "ws://10.200.208.52:8080/sendBlock"
-
+var urlGetBlock = "ws://10.200.208.52:8081/getBlock"
+var urlSendBlock = "ws://10.200.208.52:8081/sendBlock"
+var ownIpSendBlock = "ws://10.200.208.52:8080/sendBlock"
+var addPeerIp = "ws://10.200.208.52:8081/addPeer"
+var bc Blockchain
 func main() {
 
-	bc := LoadBlockchain();
+	bc = LoadBlockchain();
 	// bc.PrintChainFromRoot()
-	generateBlock(15,bc)
+	generateBlock(1)
 	// sendRequest(urlGetBlock,Request{2,"block"})
 	bc.SaveChainUsingRoot();
 }
@@ -69,23 +71,19 @@ func sendBlock(url string, block Block){
 	// fmt.Printf("Receive: %s\n", data)
 }
 
-func generateBlock(n int, bc Blockchain){
+func generateBlock(n int){
 	for i:=0;i<n;i++ {
-		privKey,pubKey := GetAccount("ayush")
+		privKey,pubKey := GetAccount("akshay")
 		value := randSeq(40)
 		r,s := GetSignature(value,privKey)
 		var d = Data{value,pubKey,r,s}
 		bytes,_ := json.Marshal(d)
-		nextBlock := bc.GenerateNextBlock(string(bytes))
-		//uncomment this to add it to your own chain
-		bc.AddBlock(nextBlock);
-		//This will send the block to the connected peers
-		sendBlock(urlSendBlock,nextBlock)
-		if bc.CheckAdditionalBlocks()		{
-			fmt.Println("Checking any newBlocks" )
-			continue;
-		}
 
+		nextBlock := bc.GenerateNextBlock(string(bytes))
+		// sendBlock(urlSendBlock,nextBlock)
+				//uncomment this to add it to your own chain
+		sendBlock(ownIpSendBlock,nextBlock)
+		//This will send the block to the connected peers
 	}
 }
 

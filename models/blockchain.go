@@ -115,7 +115,7 @@ func (root *Blockchain) AddBlock(newBlock Block) bool{
 		return false
 	}
 
-	if(root.IsValidNewBlock(newBlock)){
+	if root.IsValidNewBlock(newBlock){
 		tail := root.GetLatestNode()
 		if tail.AppendFromEnd(newBlock){
 			fmt.Println("Received Latest Block ",newBlock.Index)
@@ -126,6 +126,7 @@ func (root *Blockchain) AddBlock(newBlock Block) bool{
 		return true
 	}else{
 		if newBlock.IsThisBlockValid(){
+			// fmt.Println("forked block received, but not added to chain")
 			if root.AppendToChain(newBlock){
 				fmt.Println("Forked block received")
 				return true

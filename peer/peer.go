@@ -11,7 +11,7 @@ var bc *Blockchain
 func StartPeer(blockchain *Blockchain){
 	fmt.Println("peer started")
 	bc = blockchain
-	http.Handle("/startPeer",websocket.Handler(peerHandler))
+	http.Handle("/addPeer",websocket.Handler(peerHandler))
 	http.Handle("/getBlock", websocket.Handler(blockHandler))
 	http.Handle("/sendBlock",websocket.Handler(sendBlockHandler))
 	err := http.ListenAndServe(":8080", nil)
@@ -27,6 +27,7 @@ func sendBlockHandler(ws *websocket.Conn){
 		log.Fatal(err)
 	}
 	fmt.Println(bc.AddBlock(b));
+	bc.CheckAdditionalBlocks()
 	fmt.Println(bc.GetLatestBlock().Index, bc.GetLatestBlock().Hash)
 }
 func peerHandler (ws *websocket.Conn){
