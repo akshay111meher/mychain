@@ -9,7 +9,7 @@ func ReturnNonce(s string) string{
 	target:= big.NewInt(0)
 	target.SetString("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",16)
 	difficulty := big.NewInt(0)
-	difficulty.SetString("fffff50000000000000000000000000000000000000000000000000000000000",16)
+	difficulty.SetString("ffff000000000000000000000000000000000000000000000000000000000000",16)
 	target.Sub(target,difficulty)
 	nonce:= big.NewInt(0)
 	var byteArray [32]byte

@@ -181,6 +181,22 @@ func NewBlockchain(data string) (Blockchain){
 	return root
 }
 
+func (root *Blockchain) CheckAdditionalBlocks() bool{
+	tail := root.GetLatestNode()
+	var temp Block
+	previousHash := tail.Blocks.Hash
+	blockData := ReadFile(previousHash)
+
+	if len(blockData) == 0{
+		return true
+	}else{
+		json.Unmarshal(blockData,&temp)
+		root.AppendToChain(temp)
+		// fmt.Println("in loop")
+		return root.CheckAdditionalBlocks()
+	}
+	
+}
 func LoadBlockchain() (Blockchain){
 	var temp Block
 	var array []*Blockchain;

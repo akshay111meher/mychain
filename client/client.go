@@ -81,6 +81,11 @@ func generateBlock(n int, bc Blockchain){
 		bc.AddBlock(nextBlock);
 		//This will send the block to the connected peers
 		sendBlock(urlSendBlock,nextBlock)
+		if bc.CheckAdditionalBlocks()		{
+			fmt.Println("Checking any newBlocks" )
+			continue;
+		}
+
 	}
 }
 
