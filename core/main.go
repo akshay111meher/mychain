@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	. "../models"
-	_ "../peer"
+	peer "../peer"
 	. "../controller"
 	. "../crypto"
 	"encoding/json"
@@ -21,7 +21,7 @@ func main() {
 //    //Init Block
 // 	bc.PrintChainUsingRoot();
 	// //add more blocks 
-	generateBlock(0);
+	generateAdditionalBlock(0);
 	// //add more blocks 
 
 	// // bc.PrintChainFromRoot();
@@ -59,16 +59,16 @@ func main() {
 	// fmt.Println(bc.GetNthBlockFromRoot(5).Hash)
 	// fmt.Println("************")
 	// // bc.AddBlock(forkBlock)
-	bc.PrintChainFromRoot();
-	if(bc.IsValidChainFromEnd()){
-		fmt.Println("This is a valid Chain")
-	}else{
-		fmt.Println("This is an invalid Chain")
-	}
+	// bc.PrintChainFromRoot();
+	// if(bc.IsValidChainFromEnd()){
+	// 	fmt.Println("This is a valid Chain")
+	// }else{
+	// 	fmt.Println("This is an invalid Chain")
+	// }
 
-	bc.SaveChainUsingRoot()
-	// StartPeer(&bc)
-
+	// bc.SaveChainUsingRoot()
+	fmt.Println("latest Block:",bc.GetLatestBlock().Index,bc.GetLatestBlock().Hash)
+	peer.StartPeer(&bc)
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -81,7 +81,7 @@ func randSeq(n int) string {
     return string(b)
 }
 
-func generateBlock(n int){
+func generateAdditionalBlock(n int){
 	bc = LoadBlockchain()
 	for i:=0;i<n;i++ {
 		privKey,pubKey := GetAccount("ayush")

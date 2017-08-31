@@ -100,7 +100,9 @@ func (root *Blockchain) SaveChainUsingRoot(){
 	fmt.Println("Chain saved")
 }
 func (tail *Blockchain) SaveChain(){
-	if tail.Previous == nil{
+	if tail.Blocks.Index == "0"{
+		blockMarshal,_ := json.Marshal(tail.Blocks)
+		CreateFile(tail.Blocks.PreviousHash,blockMarshal)
 		return
 	}else{
 		blockMarshal,_ := json.Marshal(tail.Blocks)
