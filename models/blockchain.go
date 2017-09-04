@@ -9,7 +9,6 @@ import(
 	"encoding/json"
 )
 
-
 type Blockchain struct{
 	Blocks Block
 	Next []*Blockchain
@@ -45,6 +44,7 @@ func (tail *Blockchain) GetNthBlock(n int) Block{
 
 
 func (root *Blockchain) GenerateNextBlock(blockData string) Block{
+	var status bool
 	previousBlock:= root.GetLatestBlock();
 	currentIndex,_ := strconv.Atoi(previousBlock.Index);
 	nextIndexNum:= currentIndex+1;
@@ -53,19 +53,33 @@ func (root *Blockchain) GenerateNextBlock(blockData string) Block{
 	nextBlock := Block{nextIndex,previousBlock.Hash,nextTimeStamp,blockData,"",""};
 	hashByte:= nextBlock.SHA256();
 	nextBlock.Hash = string(hashByte[:])
-	nextBlock.Nonce = ReturnNonce(nextBlock.Hash)
-	return nextBlock
+	nextBlock.Nonce,status = ReturnNonce(nextBlock.Hash)
+	if status{
+		return nextBlock
+	}else{
+		return Block{}
+	}
+	
 }
 
+func (root *Blockchain) StopBlock(){
+	fmt.Println("stopblock")
+	StopBlockGeneration()
+}
 func (root *Blockchain) GetForkBlock(blockData ,previousBlockHash string, num int) Block{
+	var status bool
 	nextIndexNum:= num;
 	nextIndex := strconv.Itoa(nextIndexNum)
 	nextTimeStamp  := time.Now().Format("20060102150405")
 	nextBlock := Block{nextIndex,previousBlockHash,nextTimeStamp,blockData,"",""};
 	hashByte:= nextBlock.SHA256();
 	nextBlock.Hash = string(hashByte[:])
-	nextBlock.Nonce = ReturnNonce(nextBlock.Hash)
-	return nextBlock
+	nextBlock.Nonce,status = ReturnNonce(nextBlock.Hash)
+	if status{
+		return nextBlock
+	}else{
+		return Block{}
+	}
 }
 
 func (root *Blockchain) IsValidNewBlock(newBlock Block) bool {
@@ -89,6 +103,7 @@ func (root *Blockchain) IsValidNewBlock(newBlock Block) bool {
 		fmt.Println("hashes computed dont match")
 		return false
 	}else if(!newBlock.IsThisBlockValid()){
+		fmt.Println("blockData is wrong")
 		return false
 	}
 	return true
@@ -110,8 +125,10 @@ func (tail *Blockchain) SaveChain(){
 		tail.Previous.SaveChain()
 	}
 }
+
 func (root *Blockchain) AddBlock(newBlock Block) bool{
 	if !newBlock.IsThisDataValid(){
+		fmt.Println("Empty block/InvalidBlock. cant be added")
 		return false
 	}
 
@@ -128,7 +145,7 @@ func (root *Blockchain) AddBlock(newBlock Block) bool{
 		if newBlock.IsThisBlockValid(){
 			// fmt.Println("forked block received, but not added to chain")
 			if root.AppendToChain(newBlock){
-				fmt.Println("Forked block received")
+				fmt.Println("Forked block received. Index",newBlock.Index)
 				return true
 			}else{
 				fmt.Println("invalid forked block received")

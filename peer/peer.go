@@ -7,10 +7,10 @@ import(
 	"fmt"
 	. "../models"
 )
-var bc *Blockchain
-func StartPeer(blockchain *Blockchain){
+var bc Blockchain
+func StartPeer(){
 	fmt.Println("peer started")
-	bc = blockchain
+	bc = LoadBlockchain()
 	http.Handle("/addPeer",websocket.Handler(peerHandler))
 	http.Handle("/getBlock", websocket.Handler(blockHandler))
 	http.Handle("/sendBlock",websocket.Handler(sendBlockHandler))
@@ -27,8 +27,9 @@ func sendBlockHandler(ws *websocket.Conn){
 		log.Fatal(err)
 	}
 	fmt.Println(bc.AddBlock(b));
-	bc.CheckAdditionalBlocks()
-	fmt.Println(bc.GetLatestBlock().Index, bc.GetLatestBlock().Hash)
+	bc.SaveChainUsingRoot()
+	// bc.CheckAdditionalBlocks()
+	fmt.Println("LatestBlock:",bc.GetLatestBlock().Index, bc.GetLatestBlock().Hash)
 }
 func peerHandler (ws *websocket.Conn){
 	var r Request
@@ -36,7 +37,7 @@ func peerHandler (ws *websocket.Conn){
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Receive: ", r)
+	// fmt.Println("Receive: ", r)
 	block := bc.GetLatestBlock()
 	err = websocket.JSON.Send(ws,block)
 	
@@ -51,7 +52,7 @@ func blockHandler(ws *websocket.Conn){
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Receive: ", r)
+	// fmt.Println("Receive: ", r)
 	block := bc.GetNthBlockFromRoot(r.Number)
 	err = websocket.JSON.Send(ws,block)
 	

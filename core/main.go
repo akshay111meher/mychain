@@ -68,7 +68,7 @@ func main() {
 
 	// bc.SaveChainUsingRoot()
 	fmt.Println("latest Block:",bc.GetLatestBlock().Index,bc.GetLatestBlock().Hash)
-	peer.StartPeer(&bc)
+	peer.StartPeer()
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
