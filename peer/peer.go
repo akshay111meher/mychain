@@ -8,6 +8,7 @@ import(
 	. "../models"
 )
 var bc Blockchain
+var origin = "http://mychain0/"
 func StartPeer(){
 	fmt.Println("peer started")
 	bc = LoadBlockchain()
@@ -29,6 +30,19 @@ func sendBlockHandler(ws *websocket.Conn){
 	fmt.Println(bc.AddBlock(b));
 	bc.SaveChainUsingRoot()
 	// bc.CheckAdditionalBlocks()
+	if ws.RemoteAddr().String() == origin{
+		err = websocket.JSON.Send(ws,Request{100,"success"})
+		
+		if err != nil {
+			log.Fatal(err)
+		}	
+	}else{
+		err = websocket.JSON.Send(ws,Request{100,"stopMining"})
+		
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	fmt.Println("LatestBlock:",bc.GetLatestBlock().Index, bc.GetLatestBlock().Hash)
 }
 func peerHandler (ws *websocket.Conn){

@@ -66,6 +66,7 @@ func (root *Blockchain) StopBlock(){
 	fmt.Println("stopblock")
 	StopBlockGeneration()
 }
+
 func (root *Blockchain) GetForkBlock(blockData ,previousBlockHash string, num int) Block{
 	var status bool
 	nextIndexNum:= num;
